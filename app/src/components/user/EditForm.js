@@ -87,6 +87,7 @@ const EditForm = (props) => {
           // }
       } catch (error) {
           if (error.response) {
+            sessionStorage.clear();
               navigate("/");
           }
       }
@@ -222,8 +223,11 @@ const EditForm = (props) => {
     console.log(userGroup)
     setErr(false)
     setMsgErr("")
-
-    if(password) {
+    const useername = /^\S*$/; 
+    if(!useername.test(username)){
+      setErr(true)
+      setMsgErr("Username cannot contain spaces")
+    } else if(password) {
       console.log("Got password")
       if(password.length > 10) {
         setErr(true)
@@ -388,7 +392,6 @@ const EditForm = (props) => {
             <TextField
               margin="normal"
               type="password"
-              required
               fullWidth
               id="password"
               label="Password"
@@ -421,13 +424,13 @@ const EditForm = (props) => {
             // defaultValue = {["QA","GG"]}
             // defaultValue = {}
             // defaultValue = {displayGroupName}
-            displayGroupName
+            // displayGroupName
             options={props.groupList}
             // options={grouplist2}
             disableCloseOnSelect
             getOptionLabel={(option) => option.group_name}
             renderOption={(props, option, { selected }) => (
-            <li {...props}>
+            <li {...props} key = {option.id}>
             <Checkbox
             icon={icon}
             checkedIcon={checkedIcon}

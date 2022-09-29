@@ -52,8 +52,14 @@ export default function Navbar2(props) {
           {(sessionStorage.getItem("admin")===false) ? <Button variant="text" color="inherit" href='#'>Group Management</Button> : "" }  */}
           {/* {(props.admin) ? <Button variant="text" color="inherit" href='#'>User Management</Button> : "" }
           {(props.admin) ? <Button variant="text" color="inherit" href='#'>Group Management</Button> : "" } */}
-          <Button variant="text" color="inherit" href='/profile'>Profile</Button>
+          {sessionStorage.getItem("username") ?
+          <>
           <Button variant="text" color="inherit" href='/dashboard'>Kan Ban</Button>
+          <Button variant="text" color="inherit" href='/profile'>Profile</Button>  
+          </>
+          :
+          ""
+        }
           {sessionStorage.getItem("admin") ?
           <>
           <Button variant="text" color="inherit" href='/usermanagement'>User Management</Button>
@@ -62,6 +68,8 @@ export default function Navbar2(props) {
           :
           ""
           }
+          {/* <Button variant="text" color="inherit" href='/application'>Create Application</Button> */}
+          {/* <Button variant="text" color="inherit" href='/plan'>Create Plan</Button> */}
           {/* <Button variant="text" color="inherit" href='/'>Login</Button> */}
           {sessionStorage.getItem("username") ?
           <Button variant="text" color="inherit" href="/" onClick={Logout}>Logout</Button>

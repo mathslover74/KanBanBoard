@@ -54,8 +54,11 @@ export const viewGroup = async (req, res) => {
     sql.query(
       `
       INSERT INTO group_name (group_name) 
-      VALUES ('${req.group_Name}'); 
+      VALUES (?)
       `,
+      [
+        req.group_Name
+      ],
       (err, res1) => {
         if (err) {
           res(err, {message: err.sqlMessage});

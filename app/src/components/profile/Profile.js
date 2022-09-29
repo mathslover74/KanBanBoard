@@ -12,7 +12,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import EditProfile from './EditProfile';
-import Welcome from './Welcome';
+import Welcome from '../Welcome';
 
  
 const Profile = () => {
@@ -96,6 +96,7 @@ const Profile = () => {
           // }
       } catch (error) {
           if (error.response) {
+            sessionStorage.clear();
               navigate("/");
           }
       }
@@ -140,7 +141,7 @@ const Profile = () => {
         </TableHead>
         <TableBody>
           {users.map((user, index) => ( 
-            <EditProfile setSubmit={setSubmit} groupList={groupList} token={token} userGroup={user.group_name} username={user.username} email={user.email}/>
+            <EditProfile key={`${user.username}${index}`}setSubmit={setSubmit} groupList={groupList} token={token} userGroup={user.group_name} username={user.username} email={user.email}/>
           ))}
         </TableBody>
       </Table>

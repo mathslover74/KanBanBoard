@@ -36,11 +36,11 @@ export default function Login(props) {
     }
   }, []);
 
-  const checkAdmin = async (e) => {
+  const checkAdmin = async (username,group_name) => {
     const response = await axios.post("http://localhost:5000/checkGroup" ,
         {
           username: username,
-          group_name: "Admin"
+          group_name: group_name
         }).then(result => {
           console.log(result)
           console.log(result.data.message)
@@ -84,10 +84,14 @@ export default function Login(props) {
           console.log("data recieved")
           console.log(response.data)
           setErr(false);
-          checkAdmin()
+          checkAdmin(username,"Admin")
           sessionStorage.setItem("username", response.data.username)
           sessionStorage.setItem("Group_name", response.data.group_name)
-          navigate("/usermanagement")
+          sessionStorage.setItem("email", response.data.email)
+          setTimeout(() => {
+            navigate("/usermanagement")
+          }, 300)
+          
         }
       } catch(e) {
         console.log(e)

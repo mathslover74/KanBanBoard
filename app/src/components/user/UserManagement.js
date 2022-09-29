@@ -14,14 +14,14 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import EditForm from './EditForm';
-import CreateForm from '../CreateForm';
-import Welcome from './Welcome';
+import CreateForm from './CreateForm';
+import Welcome from '../Welcome';
 // import Button from 'react-bootstrap/Button';
 // import Modal from 'react-bootstrap/Modal';
 
 
  
-const Dashboard = () => {
+const UserManagement = () => {
     
     const [show, setShow] = useState(false);
 
@@ -151,7 +151,7 @@ const Dashboard = () => {
         </TableHead>
         <TableBody>
           {users.map((user, index) => (
-            <EditForm setSubmit={setSubmit} groupList={groupList} token={token} userGroup={user.group_name} username={user.username} email={user.email} status={user.status} index={index}/>
+            <EditForm key= {`${user.username}${index}`}setSubmit={setSubmit} groupList={groupList} token={token} userGroup={user.group_name} username={user.username} email={user.email} status={user.status} index={index}/>
             // <TableRow
             //   key={user.user}
             //   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -176,6 +176,6 @@ const Dashboard = () => {
     )
 }
  
-export default Dashboard
+export default UserManagement
 
 

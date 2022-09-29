@@ -30,13 +30,13 @@ import Checkbox from '@mui/material/Checkbox';
  
 const CreateForm = (props) => {
 
-  const [email, setEmail] = useState()
-  const [password, setPassword] = useState()
-  const [username, setUsername] = useState()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("")
   const [token, setToken] = useState('');
   const [expire, setExpire] = useState('');
   const [err, setErr] = useState(false)
-  const [errMsg, setMsgErr] = useState()
+  const [errMsg, setMsgErr] = useState("")
   const [successMsg, setSuccessMsg] = useState(false)
   const navigate = useNavigate();
   const axiosJWT = axios.create();
@@ -98,11 +98,15 @@ axiosJWT.interceptors.request.use(async (config) => {
       return false
     }
   }
+
+  const useername = /^\S*$/; 
   
   const onSubmit = async(e) => {
-    setUsername("")
-    setPassword("")
-    setEmail("")
+    // setUsername("")
+    // setPassword("")
+    // setEmail("")
+    setMsgErr(false)
+    setErr(false)
     setSuccessMsg(false)
     console.log("submit")
     console.log(username)
@@ -110,8 +114,13 @@ axiosJWT.interceptors.request.use(async (config) => {
     console.log(email)
     console.log(isValidPW(password))
     console.log(password.length)
+    setUsername(username.trim());
+    console.log(username)
     if(username && password && email) { 
-      if(password.length > 10) {
+      if(!useername.test(username)) {
+        setErr(true)
+        setMsgErr("Username cannot contain spaces")
+      } else if(password.length > 10) {
         setErr(true)
         setMsgErr("Password should be 8 to 10 char Comprise of Upper case alphabets , numbers, and special character")
       }  else if (!isValidPW(password)) {
@@ -168,7 +177,14 @@ axiosJWT.interceptors.request.use(async (config) => {
           }
         }
       }
-    }else {
+    } 
+    else if(username || password || email){
+      console.log("reach or")
+      setErr(true)
+      setMsgErr("All Field required to fill up")
+    }
+    else {
+      console.log("reach else")
       setErr(true)
       setMsgErr("All Field required to fill up")
       // console.log("all field required")

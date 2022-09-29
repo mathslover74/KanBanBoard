@@ -11,18 +11,21 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import CreateGroup from './CreateGroup';
-import GroupForm from './GroupForm';
-import Welcome from './Welcome';
+import CreateGroup from '../group/CreateGroup';
+import GroupForm from '../group/GroupForm';
+import Welcome from '../Welcome';
 import { FormGroup } from '@mui/material';
+import CreateApplication from './CreateApplication';
+import AppForm from './AppForm';
 // import Button from 'react-bootstrap/Button';
 // import Modal from 'react-bootstrap/Modal';
 
 
  
-const GroupManagement = () => {
+const ApplicationManagement = () => {
     
     const [username, setUsername] = useState('');
+    const [appp, setAppp] = useState([]);
     const [token, setToken] = useState('');
     const [expire, setExpire] = useState('');
     const [groupList, setGroupList] = useState([]);
@@ -38,28 +41,50 @@ const GroupManagement = () => {
     }, []);
 
     useEffect(() => {
+        getApp()
         setSubmit(false)
         getGroup()
     }, [submit]);
 
+    const getApp = async () => {
+      console.log("get App")
+      const response = await axiosJWT.get('http://localhost:5000/App', {
+      
+          headers: {
+              Authorization: `Bearer ${token}`
+          }
+      // const response = await axios.get('http://localhost:5000/viewGroup', {
+        
+      });
+      console.log(response)
+      console.log(response.data)
+      console.log(response.data[0])
+      // console.log(response.data);
+      setAppp(response.data)
+      console.log(appp)
+      // console.log(grouplist2)
+  }
+
+  const checkGroup = (group_name,userGroup) => {
+    if(group_name.includes(userGroup)) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+
     const getGroup = async () => {
-        console.log("get group")
         const response = await axiosJWT.get('http://localhost:5000/viewGroup', {
         
             headers: {
                 Authorization: `Bearer ${token}`
             }
-        // const response = await axios.get('http://localhost:5000/viewGroup', {
-          
         });
         console.log(response)
         console.log(response.data)
-        console.log(response.data[0].group_name)
-        // console.log(response.data);
         setGroupList(response.data)
-        console.log("dashboard get user------------------------")
         console.log(groupList)
-        // console.log(grouplist2)
     }
  
     const refreshToken = async () => {
@@ -84,6 +109,7 @@ const GroupManagement = () => {
             // }
         } catch (error) {
             if (error.response) {
+              sessionStorage.clear();
                 navigate("/");
             }
         }
@@ -116,9 +142,13 @@ const GroupManagement = () => {
       <div className= 'topNav'>
         <Welcome />
         <br></br>
-        <Typography variant="h2" align="center">Group management system</Typography>
+        <Typography variant="h2" align="center">List of Application</Typography>
         <Typography align="center">
-        <CreateGroup setSubmit={setSubmit} groupList={groupList}/>
+          {/* {sessionStorage.getItem("Group_name").includes("Project_Lead") ? */}
+          {checkGroup(sessionStorage.getItem("Group_name"),"Project_Lead")  ?
+          <CreateApplication setSubmit={setSubmit} groupList={groupList}/>
+          : ""
+        }
         {/* </Link> */}
         </Typography>
         <TableContainer component={Paper}>
@@ -126,12 +156,16 @@ const GroupManagement = () => {
         <TableHead>
           <TableRow>
             <TableCell>No</TableCell>
-            <TableCell align="right">Group_Name</TableCell>
+            <TableCell align="right">Application</TableCell>
+            <TableCell align="right">Start Date</TableCell>
+            <TableCell align="right">End Date</TableCell>
+            <TableCell align="right">View Application Detail</TableCell>
+            <TableCell align="right">Go to Application</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {groupList.map((group, index) => (
-            <GroupForm groupList={group.group_name} token={token} index={index}/>
+          {appp.map((appp, index) => (
+            <AppForm key= {appp.app_acronym} groupList={groupList} app={appp} app_acronym={appp.app_acronym} start={appp.app_startdate} end={appp.app_enddate}token={token} index={index}/>
           ))}
         </TableBody>
       </Table>
@@ -142,6 +176,6 @@ const GroupManagement = () => {
     )
 }
  
-export default GroupManagement
+export default ApplicationManagement
 
 

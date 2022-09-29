@@ -16,7 +16,7 @@ const CreateGroup = (props) => {
   const [users, setUsers] = useState([]);
   const [token, setToken] = useState('');
   const [expire, setExpire] = useState('');
-  const [groupName, setGroupName] = useState()
+  const [groupName, setGroupName] = useState([])
   const [err, setErr] = useState(false)
   const [errMsg, setMsgErr] = useState()
   const [successMsg, setSuccessMsg] = useState(false)
@@ -65,13 +65,20 @@ const CreateGroup = (props) => {
 
   const onSubmit = async(e) => {
     console.log(props.token)
-    setGroupName("")
+    // setGroupName("")
     setSuccessMsg(false)
     setMsgErr("")
     console.log("submit")
     console.log(groupName)
+    setGroupName(groupName.trim());
+    console.log(groupName)
+    console.log(groupName.length)
 
-    if(groupName) {
+    const grouppname = /^\S*$/; 
+    if(!grouppname.test(groupName)) {
+      setErr(true)
+      setMsgErr("Username cannot contain spaces")
+    } else if(groupName) {
       console.log(true)
       try {
         // const response = await axios.post('http://localhost:5000/createGroup', 

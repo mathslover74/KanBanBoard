@@ -4,6 +4,7 @@ import axios from 'axios';
 import jwt_decode from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 import Welcome from './Welcome';
+import Typography from '@mui/material/Typography';
  
 const TaskManagement = () => {
     const [username, setusername] = useState('');
@@ -29,6 +30,7 @@ const TaskManagement = () => {
 
         } catch (error) {
             if (error.response) {
+                sessionStorage.clear();
                 navigate("/");
             }
         }
@@ -66,26 +68,8 @@ const TaskManagement = () => {
     return (
         <div className="container mt-5">
             <Welcome />
-            <h1>TaskManagement{username}</h1>
-            <table className="table is-striped is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map((user, index) => (
-                        <tr key={user.index}>
-                            <td>{index + 1}</td>
-                            <td>{user.username}</td>
-                            <td>{user.email}</td>
-                        </tr>
-                    ))}
- 
-                </tbody>
-            </table>
+            <Typography variant="h3" align="left">TaskManagement App</Typography>
+            
         </div>
     )
 }

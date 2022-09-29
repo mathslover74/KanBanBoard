@@ -30,6 +30,7 @@ import response from "express"
 import sql from "../config/Database.js"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
+import validator from 'validator'
 // import session from 'express-session'
 
 export const checkGroup = async (req, res) => {
@@ -121,7 +122,88 @@ export const viewUser = async (req, res) => {
       });
   };
 
+  // export const getAllUserEmail = async (req, res) => {
+  //   console.log(req.group_name)
+  //         sql.query(
+  //           `
+  //           SELECT * from accounts WHERE group_name LIKE '%Admin%';
+  //           `,
+  //           (err, res1) => {
+  //             if (err) {
+  //               res(err, {message: err.sqlMessage});
+  //             } else {
+  //               res(null, {
+  //                 message: "No record" ,
+  //               //   result: true
+  //               });
+  //             }
+  //           }
+  //         )
+  //     }
+  
+      export const getAllUserEmail = async (req, res) => {
+        sql.query(
+          `
+          SELECT username, email, group_name from accounts WHERE group_name LIKE '%${req.group_name}%' AND status = 1;
+          `, (err, result) => {
+            if (err) {
+              res(err, {message: errno});
+            }else if (result.length == 0) {
+              res(null , "No record found");
+            } else {
+              console.log(result.length);
+              // return result
+              res(null ,result);
+            }
+          });
+      };
+
+      export const getAllUserEmail1 = async (req, res) => {
+        console.log(req)
+        console.log("Get all user email 1")
+        sql.query(
+          `
+          SELECT username, email, group_name from accounts WHERE group_name LIKE '%${req}%' AND status = 1;
+          `, (err, result) => {
+            if (err) {
+              res(err, {message: errno});
+            }else if (result.length == 0) {
+              res(null , "No record found");
+            } else {
+              console.log(result.length);
+              // return result
+              res(null ,result);
+            }
+          });
+      };
+
+
+
   export const createUser = async (req, res) => {
+
+//     const isValidEmail = (email) => {
+//       return /\S+@\S+\.\S+/.test(email);
+//     }
+  
+//     const isValidPW = (pw) => {
+//       if (validator.isStrongPassword(pw, {
+//         minLength: 8, minLowercase: 1,
+//         minUppercase: 1, minNumbers: 1, minSymbols: 1
+//       })) {
+//         return true
+//       } else {
+//         return false
+//       }
+//     }
+
+//     let useername = /^\S*$/; 
+// // const { username, email, password, confPassword } = req.body; 
+// if(!useername.test(req.username)) return res.status(400).json({msg: "Username cannot contain spaces"}); 
+// if(!eeeemail.test(email)) return res.status(400).json({msg: "Email is not valid"}); 
+// if(password !== confPassword) return res.status(400).json({msg: "Password and Confirm Password do not match"}); 
+// if(!passw.test(password)) return res.status(400).json({msg: "Password need 8-10 letters,a special character and number"});
+
+
     bcrypt.hash(req.password,10).then((hash) => {
     //   console.log(hash);
       sql.query(
@@ -149,7 +231,7 @@ export const viewUser = async (req, res) => {
       sql.query(
         `
         UPDATE accounts 
-        SET password = '${req.password}', email='${req.email}' ,status = ${req.status}, group_name =${req.group_name}
+        SET password = '${hash}', email='${req.email}' ,status = ${req.status}, group_name =${req.group_name}
         WHERE username = '${id}';
         `,
         (err, res1) => {
@@ -250,7 +332,7 @@ export const viewUser = async (req, res) => {
                     {username, email}, 
                     process.env.REFRESH_TOKEN_SECRET,
                     {expiresIn: '1d'});
-                
+                result[0].password = ""
                 result[0].access_token = accessToken
                 result[0].refresh_token = refreshToken
                 sql.query(
@@ -302,6 +384,44 @@ export const viewUser = async (req, res) => {
         // } else {
         //   res({message: "Please enter username and password"})
         // }
+      }
+    )
+  
+  }
+
+  export const verifyUser = (req, res) => { 
+    let username = req.username.trim()
+    let password = req.password.trim()
+    console.log(req)
+    console.log(req.Username)
+    console.log(req.Password)
+  
+    console.log("verify user login")
+    sql.query(
+      `
+      SELECT * FROM accounts WHERE username = ('${username}');
+      `, (err, result) => {
+        if (username && password) {
+          if(result.length === 0) {
+            console.log("incorrect username res 0")
+            res({message:"Invalid Username"});
+          } else if (result[0].status === 0) {
+            console.log("incorrect username res status = 0")
+            res({message: "User is Disabled"})
+          } else {
+            bcrypt.compare(password, result[0].password, function (err, pwresult) {
+              console.log(`result ${pwresult}`)
+              if(pwresult) {
+                console.log("all correct")
+                res({message:"Login Successfully"})
+              } else {
+                res({message:"Invalid password"});
+              }
+            })
+          }
+        } else {
+          res({message: "Password and Username Empty"})
+        }
       }
     )
   
