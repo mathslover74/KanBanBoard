@@ -142,9 +142,10 @@ export const viewUser = async (req, res) => {
   //     }
   
       export const getAllUserEmail = async (req, res) => {
+        console.log(req)
         sql.query(
           `
-          SELECT username, email, group_name from accounts WHERE group_name LIKE '%${req.group_name}%' AND status = 1;
+          SELECT username, email, group_name from accounts WHERE group_name LIKE '%${req}%' AND status = 1;
           `, (err, result) => {
             if (err) {
               res(err, {message: errno});

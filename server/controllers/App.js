@@ -466,6 +466,7 @@ export const verifyApp = async (req,res,next) => {
 
 export const createTask1 = async (req,res) => {
   let taskname = req.body.task_name.trim()
+  let rNum = 0
   if (taskname) {
     console.log("task name got things")
     appModel.getAppRNum(req.body, (err,data) => {
@@ -478,21 +479,61 @@ export const createTask1 = async (req,res) => {
         // console.log(data)
         // res.status(400).json(err);
       } else {
-        // console.log(RNum)
-        // console.log(RNum)
-        appModel.createTask1(req.body, data+1, (err,data) => {
+
+        rNum = rNum + data
+        appModel.getApp2(req.body, (err,data) => {
+          console.log("controller NUMMMMMMMMMMMMMMMMMM")
+          console.log(data[0].app_rnumber)
+          rNum = rNum + data[0].app_rnumber + 1
+          console.log(rNum)
+          if (data) {
+            console.log("create task")
+            appModel.createTask1(req.body, rNum, (err,data) => {
           if (err) {
             if (err.sqlMessage.includes("Duplicate")) {
-                res.status(400).json({code : 400});
-                // res.status(411).json({code : 412, message: err.sqlMessage});
+                // res.status(400).json({code : 400});
+                res.status(411).json({code : 412, message: err.sqlMessage});
             } else {
               console.log(err)
               res.status(400).json({message: err.message })
             }
           } else {
-            res.status(201).json({code: 201});
+            res.status(201).json({code: 201, task_id: data});
           }
         });
+
+          } else {
+            res.status(404).json({code:404});
+          }
+        })
+
+
+
+        
+
+
+        // console.log(RNum)
+        // console.log(RNum)
+
+
+
+
+        // appModel.createTask1(req.body, data+1, (err,data) => {
+        //   if (err) {
+        //     if (err.sqlMessage.includes("Duplicate")) {
+        //         // res.status(400).json({code : 400});
+        //         res.status(411).json({code : 412, message: err.sqlMessage});
+        //     } else {
+        //       console.log(err)
+        //       res.status(400).json({message: err.message })
+        //     }
+        //   } else {
+        //     res.status(201).json({code: 201});
+        //   }
+        // });
+
+
+
       }
     })
 
@@ -647,77 +688,102 @@ export const PromoteTask2Done = async (req,res) => {
       console.log(err)
       res.status(400).json(err)
     } else {
-      
-      userModel.getAllUserEmail("Project_Lead", (err,data) => {
-        if (err) {
+
+      appModel.getTaskName(req.body ,(err,data) => {
+        if(err) {
           console.log(err)
           res.status(400).json(err)
         } else {
+          console.log("GETtaskNAme Return %%%%%%%%%%%%%%%%%%%%%%%%%")
+          let taskName = data
           console.log(data)
-          let receiverEmail = []
-  
-          // let receiverEmail = data.result.reduce((prev, current) => prev + `${current.email},`, "")
-          // console.log(receiverEmail)
-          // console.log(data[0])
-          for (const e of data ){
-            // console.log(e.email)
-            receiverEmail.push(e.email)
-          }
+          console.log(taskName)
 
-          console.log("Email.............")
-          // console.log(body)
-          console.log(receiverEmail)
-          main(req.body.username, "validUser@hotmail.com", "PL@hotmail.com", req.body.task_name).catch(console.error)
+          main(req.body.username, "validUser@hotmail.com", "PL@hotmail.com", taskName).catch(console.error)
+          res.status(200).json({code:200})
 
-          async function main(username, senderEmail, receiverEmail, taskid) {
-            // Generate test SMTP service account from ethereal.email
-            // Only needed if you don't have a real mail account for testing
-            let testAccount = await nodemailer.createTestAccount()
-            console.log("receipient:", receiverEmail)
-            // create reusable transporter object using the default SMTP transport
+      async function main(username, senderEmail, receiverEmail, taskid) {
+        // Generate test SMTP service account from ethereal.email
+        // Only needed if you don't have a real mail account for testing
+        let testAccount = await nodemailer.createTestAccount()
+        console.log("receipient:", receiverEmail)
+        // create reusable transporter object using the default SMTP transport
+      
+        var transporter = nodemailer.createTransport({
+          host: "smtp.mailtrap.io",
+          port: 2525,
+          auth: {
+            user: "3002c4b07fb2a5",
+            pass: "7f03abba198860",
+          },
+        })
+        // send mail with defined transport object
+        let info = await transporter.sendMail({
+          from: `${username} 👻 ${senderEmail}`, // sender address
+          to: `${receiverEmail}`, //"bar@example.com, baz@example.com", // list of receivers
+          subject: `Task ${taskid} Completion ✔`, // Subject line
+          text: `${username} has finish the task on '${new Date().toUTCString()}'`, // plain text body
+          html: `${username} has finish the task on ${new Date().toUTCString()}`, // html body
+        })
+      
+        console.log("Message sent: %s", info.messageId)
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+      
+        // Preview only available when sending through an Ethereal account
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info))
+        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+      }
           
-            var transporter = nodemailer.createTransport({
-              host: "smtp.mailtrap.io",
-              port: 2525,
-              auth: {
-                user: "3002c4b07fb2a5",
-                pass: "7f03abba198860",
-              },
-            })
-            // send mail with defined transport object
-            let info = await transporter.sendMail({
-              from: `${username} 👻 ${senderEmail}`, // sender address
-              to: `${receiverEmail}`, //"bar@example.com, baz@example.com", // list of receivers
-              subject: `Task ${taskid} Completion ✔`, // Subject line
-              text: `${username} has finish the task on '${new Date().toUTCString()}'`, // plain text body
-              html: `${username} has finish the task on ${new Date().toUTCString()}`, // html body
-            })
-          
-            console.log("Message sent: %s", info.messageId)
-            // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-          
-            // Preview only available when sending through an Ethereal account
-            console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info))
-            // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-          }
-
-
-
         }
-      });
+      })
+
+
+
+
+      
+      // userModel.getAllUserEmail("Project_Lead", (err,data) => {
+        
+        
+      //   if (err) {
+      //     console.log(err)
+      //     res.status(400).json(err)
+      //   } else {
+      //     console.log(data)
+      //     let receiverEmail = []
+  
+      //     // let receiverEmail = data.result.reduce((prev, current) => prev + `${current.email},`, "")
+      //     // console.log(receiverEmail)
+      //     // console.log(data[0])
+      //     for (const e of data ){
+      //       // console.log(e.email)
+      //       receiverEmail.push(e.email)
+      //     }
+
+      //     console.log("Email.............")
+      //     // console.log(body)
+      //     console.log(receiverEmail)
+          
+          
+
+          
+
+
+
+      //   }
+      // });
 
 
 
       // res.status(200).json(data);
       // res.status(200).json({code:200, message:"Task successfully promoted to done"})
-      res.status(200).json({code:200})
+      
     }
   });
 }
 
 export const getTask = async (req,res, next) => {
   console.log(req.body)
-  let taskname = req.body.task_name.trim()
+  let taskname = req.body.task_id.trim()
   
   if(taskname) {
     appModel.getTask(req.body, (err,data) => {
@@ -740,6 +806,32 @@ export const getTask = async (req,res, next) => {
         } else {
           // res.status(404).json({code: 404 , message:"Task name not found"})
           res.status(404).json({code: 404})
+        }
+        // console.log(data)
+      }
+    });
+  } else {
+    // res.status(411).json({code: 411 , message:"Task_name Empty"})
+    res.status(411).json({code: 411})
+  }
+}
+
+export const getTask2 = async (req,res, next) => {
+  console.log(req.body)
+  let taskname = req.body.app_acronym.trim()
+  if(taskname) {
+    appModel.getTask2(req.body, (err,data) => {
+      // console.log(data)
+      if(err) {
+        console.log(err)
+        res.status(400).json(err)
+      } else {
+        if(data.length > 0) {
+          console.log(data[0].task_state)
+          res.status(411).json({code: 411})
+        } else {
+          // res.status(404).json({code: 404 , message:"Task name not found"})
+          next()
         }
         // console.log(data)
       }
@@ -782,7 +874,7 @@ export const checkapi2 = (req, res,next) => {
 
 export const checkapi3 = (req, res, next) => {
 
-  if(req.body.username && req.body.password && req.body.task_name) {
+  if(req.body.username && req.body.password && req.body.task_id) {
     console.log("all mandatory in")
     next()
   } else {
@@ -790,6 +882,8 @@ export const checkapi3 = (req, res, next) => {
     res.status(400).json({code:400})
   }
 }
+
+
 // export const error1 = (req, res,next) => {
 //   console.log(req)
 //   console.log("HELLLLLLLLLLLLLLLLLO")

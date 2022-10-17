@@ -85,7 +85,7 @@ router.post("/getAuditBy", verifyToken,appController.getAuditBy);
 
 /// Assignment 3
 
-router.post("/api/CreateTask",[appController.checkapi1,userController.verifyUser, appController.verifyApp, appController.getPlanByApp1],appController.createTask1 );
+router.post("/api/CreateTask",[appController.checkapi1,userController.verifyUser, appController.verifyApp, appController.getPlanByApp1,appController.getTask2],appController.createTask1 );
 // router.post("/api/CreateTask",[appController.getPlanByApp1] );
 router.post("/api/GetTaskbyState",[appController.checkapi2,userController.verifyUser,appController.getApp1, appController.checkState],appController.getTaskByAppNState );
 // router.post("/api/GetTaskbyState",[appController.getApp1]);

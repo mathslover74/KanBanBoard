@@ -6,14 +6,20 @@
 // });
  
 // export default db;
-
+import * as dotenv from 'dotenv'
+dotenv.config()
 import mysql from 'mysql'
 
 const db = mysql.createConnection({
-	host     : 'localhost',
-	user     : 'root',
-	password : '1234',
-	database : 'nodelogin',
+	// host     : 'localhost',
+	// user     : 'root',
+	// password : '1234',
+	// database : 'nodelogin',
+	// host: process.env.HOST || "host.docker.internal",
+	host: process.env.HOST ,
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  database: process.env.NAME,
 });
 
 db.connect(function(err) {

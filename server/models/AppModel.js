@@ -705,10 +705,12 @@ export const createTask1 = async (req,Rnum, res) => {
         if (err) {
           res(err, {message: err.sqlMessage});
         } else {
-          res(null, {
-            message: 'Task created successfully' ,
-          //   result: true
-          });
+          res(null, new_app_acronym
+          //   {
+          //   message: 'Task created successfully' ,
+          // //   result: true
+          // }
+          );
         }
       }
     )
@@ -723,6 +725,7 @@ export const getAppRNum = async (req, res) => {
     SELECT * FROM task WHERE task_app_acronym = '${req.app_acronym}';
     `, (err, result) => {
       console.log(result)
+      console.log("*********************")
       if (err) {
         res(err, {message: errno});
       } else {
@@ -796,6 +799,27 @@ export const getApp1 = async (req, res) => {
     });
 };
 
+export const getApp2 = async (req, res) => {
+  console.log(req)
+  sql.query(
+    `
+    SELECT * FROM application where app_acronym = '${req.app_acronym}';
+    `, (err, result) => {
+      console.log("get app2 modal result")
+      console.log(result)
+      if (err) {
+        res(err, {message: errno});
+      }else if (result.length == 0) {
+        res(null , result);
+      } else {
+        console.log("view application list");
+        console.log(result.length);
+        // return result
+        res(null ,result);
+      }
+    });
+};
+
 export const PromoteTask2Done = async (req, res) => {
 
     sql.query(
@@ -803,7 +827,7 @@ export const PromoteTask2Done = async (req, res) => {
       UPDATE task 
       SET 
       task_state = 'done'
-      WHERE task_name = '${req.task_name}';
+      WHERE task_id = '${req.task_id}';
       `,
       (err, res1) => {
         console.log(res1)
@@ -861,10 +885,10 @@ export const getTask = async (req, res) => {
   console.log(req)
   sql.query(
     `
-    SELECT * FROM task WHERE task_name = '${req.task_name}';
+    SELECT * FROM task WHERE task_id = '${req.task_id}';
     `, (err, result) => {
       if (err) {
-        res(err, {message: errno});
+        res(err, {message: errnof});
       } else {
         // console.log(result)
         if(result.length > 0) {
@@ -875,3 +899,50 @@ export const getTask = async (req, res) => {
       }
     });
 };
+
+export const getTask2 = async (req, res) => {
+  console.log("get task2")
+  console.log(req)
+  sql.query(
+    `
+    SELECT * FROM task WHERE task_name = '${req.task_name}';
+    `, (err, result) => {
+      if (err) {
+        res(err, {message: errno});
+      } else {
+        console.log("get task 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        console.log(result)
+        if(result.length > 0) {
+          res(null,result)
+        } else {
+          res(null, result)
+        }
+      }
+    });
+};
+
+export const getTaskName = (req, res) => {
+  console.log("get task")
+  console.log(req)
+  sql.query(
+    `
+    SELECT * FROM task WHERE task_id = '${req.task_id}';
+    `, (err, result) => {
+      if (err) {
+        res(err, {message: errnof});
+      } else {
+        console.log("Get task NAME 000000000000000000000000000")
+        console.log(result)
+        console.log(result[0])
+
+        if(result.length > 0) {
+          // return result[0].task_name
+          res(null,result[0].task_name)
+        } else {
+          // return result[0].task_name
+          res(null, result[0].task_name)
+        }
+      }
+    });
+};
+

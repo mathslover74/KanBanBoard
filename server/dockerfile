@@ -1,0 +1,19 @@
+FROM node:16-alpine
+# Create application directory
+WORKDIR /app
+# Copy required app dependencies
+COPY package.json ./
+
+# Install dependencies
+RUN npm install
+
+# Run User
+RUN adduser -S notRoot
+USER notRoot
+
+# Copy source code
+COPY . .
+
+EXPOSE 5000
+# Command to run docker
+CMD ["node", "index.js"]
